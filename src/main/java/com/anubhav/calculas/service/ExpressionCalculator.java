@@ -14,8 +14,6 @@ import java.util.Stack;
 @Service
 public class ExpressionCalculator {
     private Tokenizer tokenizer;
-    private Stack<Double> operandStack = new Stack();
-    private Stack<Operator> operatorStack = new Stack();
 
     @Autowired
     public ExpressionCalculator(Tokenizer tokenizer) {
@@ -23,6 +21,8 @@ public class ExpressionCalculator {
     }
 
     public Double calculate(String expr) {
+        Stack<Double> operandStack = new Stack<>();
+        Stack<Operator> operatorStack = new Stack<>();
         try {
             List<Token> tokens = tokenizer.tokenize(expr);
             for (Token token : tokens) {
@@ -30,40 +30,53 @@ public class ExpressionCalculator {
                     operandStack.push(((Number) token).getNumericValue());
                 } else {
                     Operator op = (Operator) token;
-                    if (op == Operator.BRACKET_OPEN) {
-                        operatorStack.push(op);
-                    } else if (op == Operator.BRACKET_CLOSE) {
-                        while (operatorStack.peek() != Operator.BRACKET_OPEN) {
-                            Operator operator = operatorStack.pop();
-                            double operand1 = operandStack.pop();
-                            double operand2 = operandStack.pop();
-                            operandStack.push(operator.operate(operand2, operand1));
-                        }
-                        operatorStack.pop();
-                    } else {
-                        while (!operatorStack.isEmpty() &&
-                                operatorStack.peek().getPrecedence() >= op.getPrecedence()) {
-                            Operator operator = operatorStack.pop();
-                            Double operand1 = operandStack.pop();
-                            Double operand2 = operandStack.pop();
-                            operandStack.push(operator.operate(operand2, operand1));
-                        }
-                        operatorStack.push(op);
+                    switch (op) {
+                        case BRACKET_OPEN:
+                            operatorStack.push(op);
+                            break;
+                        case BRACKET_CLOSE:
+                            handleClosedBracket(operatorStack, operandStack);
+                            break;
+                        default:
+                            operateTillPrecedes(op, operatorStack, operandStack);
+                            operatorStack.push(op);
                     }
                 }
 
 
             }
-            while (!operatorStack.isEmpty()) {
-                Operator operator = operatorStack.pop();
-                Double operand1 = operandStack.pop();
-                Double operand2 = operandStack.pop();
-                operandStack.push(operator.operate(operand2, operand1));
-            }
-
+            operateTheRemaining(operatorStack, operandStack);
             return operandStack.pop();
         } catch (RuntimeException ex) {
-            throw new InvalidExpressionException("");
+            throw new InvalidExpressionException("Expression passed is invalid");
         }
+    }
+
+    private void operateTillPrecedes(Operator op, Stack<Operator> operatorStack,
+                                     Stack<Double> operandStack) {
+        while (!operatorStack.isEmpty() &&
+                operatorStack.peek().getPrecedence() >= op.getPrecedence()) {
+            handleBinaryOperator(operatorStack, operandStack);
+        }
+    }
+
+    private void handleBinaryOperator(Stack<Operator> operatorStack, Stack<Double> operandStack) {
+        Operator operator = operatorStack.pop();
+        Double operand1 = operandStack.pop();
+        Double operand2 = operandStack.pop();
+        operandStack.push(operator.operate(operand2, operand1));
+    }
+
+    private void operateTheRemaining(Stack<Operator> operatorStack, Stack<Double> operandStack) {
+        while (!operatorStack.isEmpty()) {
+            handleBinaryOperator(operatorStack, operandStack);
+        }
+    }
+
+    private void handleClosedBracket(Stack<Operator> operatorStack, Stack<Double> operandStack) {
+        while (operatorStack.peek() != Operator.BRACKET_OPEN) {
+            handleBinaryOperator(operatorStack, operandStack);
+        }
+        operatorStack.pop();
     }
 }

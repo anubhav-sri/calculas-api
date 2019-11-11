@@ -1,7 +1,8 @@
 package com.anubhav.calculas.tokenization;
 
+import com.anubhav.calculas.controllers.InvalidExpressionException;
+
 import java.util.Arrays;
-import java.util.Optional;
 
 public enum Operator implements Token {
 
@@ -42,16 +43,11 @@ public enum Operator implements Token {
         }
 
     }, BRACKET_OPEN('(') {
-        public int getPrecedence() {
-            return 0;
-        }
 
     }, BRACKET_CLOSE(')') {
-        public int getPrecedence() {
-            return 0;
-        }
 
     };
+    public static final int DEFAULT_PRECEDENCE = 0;
     private Character value;
 
     Operator(Character value) {
@@ -59,11 +55,11 @@ public enum Operator implements Token {
     }
 
     public double operate(double rightOperand, double leftOperand) {
-        throw new RuntimeException();
+        throw new RuntimeException("Method NOT Implemented");
     }
 
     public int getPrecedence() {
-        return 0;
+        return DEFAULT_PRECEDENCE;
     }
 
     @Override
@@ -72,6 +68,9 @@ public enum Operator implements Token {
     }
 
     public static Operator valueOf(Character ch) {
-        return Arrays.asList(Operator.values()).stream().filter(v -> v.value.equals(ch)).findFirst().get();
+        return Arrays.stream(Operator.values())
+                .filter(v -> v.value.equals(ch))
+                .findFirst().orElseThrow(() -> new InvalidExpressionException("Invalid Operator"));
+
     }
 }

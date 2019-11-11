@@ -63,7 +63,7 @@ public class ExpressionCalculator {
 
             return operandStack.pop();
         } catch (RuntimeException ex) {
-            throw new InvalidExpressionException();
+            throw new InvalidExpressionException("");
         }
     }
 }

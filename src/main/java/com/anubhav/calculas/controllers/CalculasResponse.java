@@ -7,9 +7,8 @@ public class CalculasResponse {
     public CalculasResponse() {
     }
 
-    public CalculasResponse(boolean error, Double result) {
-
-        this.error = error;
+    public CalculasResponse(Double result) {
+        this.error = false;
         this.result = result;
     }
 

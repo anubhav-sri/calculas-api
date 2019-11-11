@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 public class CalculasController {
@@ -20,8 +21,13 @@ public class CalculasController {
     }
 
     @GetMapping("/calculas")
-    public CalculasResponse calculate(@RequestParam("query") String expression) throws UnsupportedEncodingException {
-        String bytes = new String(Base64.decodeBase64(expression.getBytes()),"utf-8").replace(" ","");
-        return new CalculasResponse(false, calculator.calculate(bytes));
+    public CalculasResponse calculate(@RequestParam("query") String expression) {
+        String decodedExpression = decodeAndTrim(expression);
+        Double result = calculator.calculate(decodedExpression);
+        return new CalculasResponse(result);
+    }
+
+    private String decodeAndTrim(@RequestParam("query") String expression) {
+        return new String(Base64.decodeBase64(expression.getBytes()), StandardCharsets.UTF_8).replace(" ", "");
     }
 }

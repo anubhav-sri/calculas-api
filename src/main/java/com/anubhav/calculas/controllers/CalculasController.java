@@ -1,7 +1,7 @@
 package com.anubhav.calculas.controllers;
 
 
-import com.anubhav.calculas.service.ExpressionCalculator;
+import com.anubhav.calculas.service.ExpressionCalculatorService;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +12,10 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 public class CalculasController {
-    private ExpressionCalculator calculator;
+    private ExpressionCalculatorService calculator;
 
     @Autowired
-    public CalculasController(ExpressionCalculator calculator) {
+    public CalculasController(ExpressionCalculatorService calculator) {
         this.calculator = calculator;
     }
 

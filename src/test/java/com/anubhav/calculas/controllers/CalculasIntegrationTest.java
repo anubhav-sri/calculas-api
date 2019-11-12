@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,5 +22,12 @@ public class CalculasIntegrationTest {
         CalculasResponse response = restTemplate.getForObject("/calculas?query=MTIrMTI=", CalculasResponse.class);
         assertThat(response.isError()).isFalse();
         assertThat(response.getResult()).isEqualTo(24);
+    }
+
+    @Test
+    public void shouldReturnHttpStatusBadRequestWhenCalledWithInValidExpression() {
+        ErrorResponse response = restTemplate.getForObject("/calculas?query=MTIrKysxMysgMTI=", ErrorResponse.class);
+        assertThat(response.isError()).isTrue();
+        assertThat(response.getMessage()).isEqualTo("Expression passed is invalid");
     }
 }

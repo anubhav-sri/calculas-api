@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Stack;
 
 @Service
-public class ExpressionCalculator {
+public class ExpressionCalculatorService {
     private Tokenizer tokenizer;
 
     @Autowired
-    public ExpressionCalculator(Tokenizer tokenizer) {
+    public ExpressionCalculatorService(Tokenizer tokenizer) {
         this.tokenizer = tokenizer;
     }
 
